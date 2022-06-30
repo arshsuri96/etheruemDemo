@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract LipToken is ERC721, Ownable {
 
     uint256 COUNTER;
-    uint256 fee= 0.001 ether;
+    uint256 fee= 1 ether;
 
     struct Lip{
         string name;
@@ -32,6 +32,16 @@ contract LipToken is ERC721, Ownable {
         return randomNum % _mod;
     }
 
+
+    function updatefee(uint256 _fee) external onlyOwner(){
+        fee = _fee;
+    }
+
+    function withdraw() external payable onlyOwner {
+        address payable _owner = payable(owner());
+        _owner.transfer(address(this).balance);
+  }
+
     function _createLip(string memory _name) internal {
         uint8 randRarity = uint8(_createRandomNum(100));
         uint256 randDna = _createRandomNum(10**16);
@@ -42,7 +52,8 @@ contract LipToken is ERC721, Ownable {
         COUNTER++;
   }
 
-    function createRandomLip(string memory _name) public {
+    function createRandomLip(string memory _name) public payable{
+        require(msg.value == fee );
         _createLip(_name);
     }
 
